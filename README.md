@@ -1,6 +1,6 @@
 # automaticWordPressDeployment
 automated deployment process for a WordPress website using Nginx as the web server, LEMP (Linux, Nginx, MySQL, PHP) stack, and GitHub Actions with security best practices and ensure optimal performance of the website.
-this guide helps you to setup automated deployment process for a WordPress website with major **cloud** providers /** locally**  
+this guide helps you to setup automated deployment process for a WordPress website with major **cloud** providers / **locally**  
 
 Server Provisioning:
 
@@ -79,7 +79,8 @@ Download and install WordPress :
     
 Configure Nginx to access the wordpress :
 
-    sudo vim /etc/nginx/sites-available/wordpress    
+    sudo vim /etc/nginx/sites-available/wordpress  
+
 put below code block in to config file 
     
     server {
@@ -102,7 +103,7 @@ put below code block in to config file
                 }
             }   
          
-   ** save and exit the file**
+   **save and exit the file**
    
     sudo rm /etc/nginx/sites-enabled/default 
     sudo ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/wordpress
@@ -111,4 +112,39 @@ put below code block in to config file
 Visit public ip to see wordpress setup page :
 
     http://your_server_ip       
+
+Secure Nginx with Let's Encrypt :
+Regester or get domain name of your choice. This guide will use **example.com** throughout
+i am using https://www.noip.com/ for DNS which is free within 30 days 
+created **A** record with **example.com** pointing to your server’s **public IP** address.
+
+will use certbot for this activity : 
+
+    sudo apt install certbot python3-certbot-nginx
+
+now edit the server_name in nginx wordpress conf file :
+
+    sudo vim /etc/nginx/sites-available/wordpress
+    replace server_name _; with server_name example.com
+
+than save and exit
+verify nginx conf file with below command (it should complete without any errors) :
+
+    sudo nginx -t         
+
+reload nginx : 
+
+    sudo systemctl reload nginx
+
+update the firewall settings ufw :
+
+    sudo ufw allow 'Nginx Full'
+    sudo ufw delete allow 'Nginx HTTP'  
+    sudo ufw status
+
+generate certs with certbot :
+    
+    sudo certbot --nginx -d example.com -d www.example.com
+
+
 
