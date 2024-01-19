@@ -1,5 +1,6 @@
 # automaticWordPressDeployment
 automated deployment process for a WordPress website using Nginx as the web server, LEMP (Linux, Nginx, MySQL, PHP) stack, and GitHub Actions with security best practices and ensure optimal performance of the website.
+this guide helps you to setup automated deployment process for a WordPress website with major **cloud** providers /** locally**  
 
 Server Provisioning:
 
@@ -11,6 +12,7 @@ Server Provisioning:
     Configure firewall to allow necessary incoming traffic and restrict unnecessary access.
 
     Generate and configure SSH key pairs for secure remote access...
+    you can continue below with your local machine/server. 
 
 Nginx, MySQL/MariaDB, and PHP Setup:
  
@@ -25,7 +27,7 @@ Installing NGINX and starting NGINX service at startup:
     sudo systemctl start nginx
     sudo systemctl status nginx
     
-If firewall is active/going to enable we need to allow NGINX with ufw (optional) :
+If firewall is active/going to enable we need to allow NGINX with ufw :
 
     sudo ufw app list
     sudo ufw allow 'Nginx HTTP'
@@ -49,11 +51,11 @@ Install and configure mysql server :
     sudo systemctl restart mysql
     sudo systemctl enable mysql
     
-    If you enabled ufw allow traffic to mysql on its default port 3306 : 
+If you enabled ufw allow traffic to mysql on its default port 3306 : 
     
         sudo ufw allow from any to any port 3306 proto tcp
         
-    change root password and create user for wordpress :   
+change root password and create user for wordpress :   
     
         sudo mysql
         ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'Testpassword@123';
@@ -65,7 +67,7 @@ Install and configure mysql server :
         
 Install and setup PHP :
 
-    sudo apt install php-fpm php-mysql php php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip 
+    sudo apt install php-fpm php-mysql php php-curl php-gd php-intl php-zip 
     sudo systemctl start php8.1-fpm   //8.1 version 
     sudo systemctl enable php8.1-fpm
     
@@ -78,8 +80,8 @@ Download and install WordPress :
 Configure Nginx to access the wordpress :
 
     sudo vim /etc/nginx/sites-available/wordpress    
-    put below server block between ->  <- these symboles (without these symbols) in to config file 
-    ->
+put below code block in to config file 
+    
     server {
                 listen 80;
                 listen [::]:80;
@@ -99,7 +101,7 @@ Configure Nginx to access the wordpress :
                 fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
                 }
             }   
-    <-      
+         
    ** save and exit the file**
    
     sudo rm /etc/nginx/sites-enabled/default 
