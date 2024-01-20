@@ -1,0 +1,68 @@
+name: build-deploy
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'bin/**'
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+            
+      - name: Install Composer dependencies
+        uses: php-actions/composer@v6
+
+      - name: Install Node.js LTS
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn'
+
+      - name: Install Node.js dependencies
+        run: yarn install
+
+      - name: Build theme
+        run: yarn run build
+         
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.2.0
+        with:
+          name: my-theme-build
+          path: |
+            dist/
+            vendor/
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-theme-build
+          path: .
+
+      - name: Sync
+        env:
+          dest: '${{secrets.SERVER_USER}}@${{secrets.SERVER}}:${{secrets.SERVER_PATH}}'
+        run: |
+          echo "${{secrets.DEPLOY_KEY}}" > deploy_key
+          chmod 600 ./deploy_key
+          rsync -chav --delete \
+            -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no' \
+            --exclude /deploy_key \
+            --exclude /.git/ \
+            --exclude /.github/ \
+            --exclude /node_modules/ \
+            ./ ${{env.dest}}
