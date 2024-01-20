@@ -70,4 +70,4 @@ jobs:
             --exclude '.*' \
             --exclude '/cgi-bin/' \
             --exclude 'README.md' \
-            ./ ${{env.dest}}
+            ../ ${{env.dest}}
