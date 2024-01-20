@@ -26,8 +26,8 @@ jobs:
       - name: Install Node.js dependencies
         run: yarn install
 
-      - name: Build theme
-        run: yarn run build
+      #- name: Build theme
+        #run: yarn run build
          
       - name: Upload artifact
         uses: actions/upload-artifact@v4.2.0
