@@ -39,6 +39,7 @@ jobs:
           retention-days: 1
 
   deploy:
+    if: ${{ github.event.push.conclusion == 'success' }}
     runs-on: ubuntu-latest
     needs: build
     steps:
