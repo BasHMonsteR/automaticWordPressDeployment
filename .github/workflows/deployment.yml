@@ -14,8 +14,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
             
-      - name: Install Composer dependencies
-        uses: php-actions/composer@v6
+      #- name: Install Composer dependencies
+       # uses: php-actions/composer@v6
 
       - name: Install Node.js LTS
         uses: actions/setup-node@v4.0.1
