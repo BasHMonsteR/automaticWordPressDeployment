@@ -1,0 +1,12 @@
+## Directories to ignore
+.vscode/**
+.env.**
+.git/
+.github/
+
+## Files to ignore
+.gitignore
+package.json
+package-lock.json
+composer.json
+composer.lock
