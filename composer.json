@@ -10,7 +10,6 @@
     ],
     "require": {
         "composer/installers": "~1.0",
-        "ffraenz/private-composer-installer": "^5.0",
         "wpackagist-plugin/duplicate-post": "^4.5",
         "wpackagist-plugin/svg-support": "^2.5.1",
         "wpackagist-plugin/wordpress-seo": "^19.10"
