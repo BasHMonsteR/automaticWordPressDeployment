@@ -2,11 +2,7 @@
     "name": "wpe/wp-content",
     "description": "manage dependencies with Composer and deploy to WP",
     "type": "project",
-    "config": {
-      "allow-plugins": {
-        "composer/installers": true
-        }
-    }
+    
     "repositories": [
             {
             "type": "composer",
