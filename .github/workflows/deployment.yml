@@ -64,10 +64,4 @@ jobs:
             --exclude /deploy_key \
             --exclude /.git/ \
             --exclude /.github/ \
-            --exclude /node_modules/ \
-            -exclude '/deploy_key' \
-            --exclude '/.*/' \
-            --exclude '.*' \
-            --exclude '/cgi-bin/' \
-            --exclude 'README.md' \
-            . ${{env.dest}}
+            ./ ${{env.dest}}
