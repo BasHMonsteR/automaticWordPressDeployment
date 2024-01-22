@@ -20,13 +20,13 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'database_name_here' );
+define( 'DB_NAME', 'wp' );
 
 /** Database username */
-define( 'DB_USER', 'username_here' );
+define( 'DB_USER', 'wp_user' );
 
 /** Database password */
-define( 'DB_PASSWORD', 'password_here' );
+define( 'DB_PASSWORD', 'SupeRStrong#7' );
 
 /** Database hostname */
 define( 'DB_HOST', 'localhost' );
@@ -48,15 +48,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         'put your unique phrase here' );
-define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
-define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
-define( 'NONCE_KEY',        'put your unique phrase here' );
-define( 'AUTH_SALT',        'put your unique phrase here' );
-define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
-define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
-define( 'NONCE_SALT',       'put your unique phrase here' );
-
+define('AUTH_KEY',         'T]9zq=ag.|5lSodxfrP@}n5@fYo<Rq=zp|Y {D@S+(`h!3gQxnTT$yiC2]yDY>h6');
+define('SECURE_AUTH_KEY',  ')MgyM}WrcePqXNK_7qwW]k9Cr3|]b/g4d,B:0--I_NyNPFX!8}(S%K.}EuLgVK#p');
+define('LOGGED_IN_KEY',    '<XBwjSPkBrL]`Fsg^]_,WmfKy}xmpZPfwuaEZ?lS!mJPtT)l}]{<V)Y|mdZpH>lT');
+define('NONCE_KEY',        'VKV&ZhZn/C`7}D7+O||M:AyB|<ngD5Cl7h!3[+V%- %ItRip`^ZDD7omC6)x,Ex^');
+define('AUTH_SALT',        'kX~V#Yl=2[/Z3H^n[qDTC #R_hU00d+]++L!Q,eixO-..cFX(6wYe},-}^8*|gGv');
+define('SECURE_AUTH_SALT', 'lfd.Y^5mnAha2(}<:(@1@K@:B%!(.vgnhcJ*-|Hx}q>SHVn}N-&{n*fYG[+v[O!]');
+define('LOGGED_IN_SALT',   'FtC10rZ4ECLH~^AbHZw-d1]Z39;+Ts^QnuH||&s)(L4OR|:]zx0g!|&ITfLQ_k>5');
+define('NONCE_SALT',       ']4n2[H0/XV7&wU-A=T-O_0D[F}$z?^qb>XHQ G6+&ZK;(wc5Ay8=02*R[xZBnY]f');
 /**#@-*/
 
 /**
@@ -80,7 +79,7 @@ $table_prefix = 'wp_';
  * @link https://wordpress.org/documentation/article/debugging-in-wordpress/
  */
 define( 'WP_DEBUG', false );
-
+define( 'FS_METHOD', 'direct' );
 /* Add any custom values between this line and the "stop editing" line. */
 
 

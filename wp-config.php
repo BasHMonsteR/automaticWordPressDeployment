@@ -32,7 +32,7 @@ define( 'DB_PASSWORD', 'SupeRStrong#7' );
 define( 'DB_HOST', 'localhost' );
 
 /** Database charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_CHARSET', 'utf8' );
 
 /** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
@@ -48,15 +48,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         ';>7b4e!zP~BTp@l*4lYy|l3nHL9xKYxb~P^&%(N2u/NE9:?3FYbFDzDLk3xt+:A)' );
-define( 'SECURE_AUTH_KEY',  'N&FJzBes!.YA8G1p?z)QH+:4J[6r[4yQluQfyw$m=/*-=fdcK7)^M(6@7^dz%*&X' );
-define( 'LOGGED_IN_KEY',    'Wm9g@(n<;%9<,hi;u=SE.=&Rd[&[_,2YP~K;&2*uFNb}NBT{u*yWUFZ2?:{/af8J' );
-define( 'NONCE_KEY',        'ny(b>X.9-~7y `gaX~pgyP` =/ 4<CNe*)[o&J oIf*i#6f,^I1<Yk>_@zih-.I`' );
-define( 'AUTH_SALT',        'IMJ$LRaf@qpGMfod:f4z9FR5VP:ypvNM%}6]u?d%G1KA-M%!FI)GC%!jb<*IP+@u' );
-define( 'SECURE_AUTH_SALT', 'SfD{nX~sm#;$(;G6!w>[p/mQC6:bc0)g`pq<{ge07P!VF8xGqBF [v 7WSj>i_8V' );
-define( 'LOGGED_IN_SALT',   'e!*@ppfjE@FXs&iWcrDo18u/7x}3o:o0t!|>u6upn~}Se`nOT:3qhU)~PjYzAMcn' );
-define( 'NONCE_SALT',       'zEedsu4Ht)1EZ}Y]h$27O{/tS_s]@DU5s>%S3L/2LyA6q{`cNYHSI=Nw^y?KUnu$' );
-
+define('AUTH_KEY',         'T]9zq=ag.|5lSodxfrP@}n5@fYo<Rq=zp|Y {D@S+(`h!3gQxnTT$yiC2]yDY>h6');
+define('SECURE_AUTH_KEY',  ')MgyM}WrcePqXNK_7qwW]k9Cr3|]b/g4d,B:0--I_NyNPFX!8}(S%K.}EuLgVK#p');
+define('LOGGED_IN_KEY',    '<XBwjSPkBrL]`Fsg^]_,WmfKy}xmpZPfwuaEZ?lS!mJPtT)l}]{<V)Y|mdZpH>lT');
+define('NONCE_KEY',        'VKV&ZhZn/C`7}D7+O||M:AyB|<ngD5Cl7h!3[+V%- %ItRip`^ZDD7omC6)x,Ex^');
+define('AUTH_SALT',        'kX~V#Yl=2[/Z3H^n[qDTC #R_hU00d+]++L!Q,eixO-..cFX(6wYe},-}^8*|gGv');
+define('SECURE_AUTH_SALT', 'lfd.Y^5mnAha2(}<:(@1@K@:B%!(.vgnhcJ*-|Hx}q>SHVn}N-&{n*fYG[+v[O!]');
+define('LOGGED_IN_SALT',   'FtC10rZ4ECLH~^AbHZw-d1]Z39;+Ts^QnuH||&s)(L4OR|:]zx0g!|&ITfLQ_k>5');
+define('NONCE_SALT',       ']4n2[H0/XV7&wU-A=T-O_0D[F}$z?^qb>XHQ G6+&ZK;(wc5Ay8=02*R[xZBnY]f');
 /**#@-*/
 
 /**
@@ -80,7 +79,7 @@ $table_prefix = 'wp_';
  * @link https://wordpress.org/documentation/article/debugging-in-wordpress/
  */
 define( 'WP_DEBUG', false );
-
+define( 'FS_METHOD', 'direct' );
 /* Add any custom values between this line and the "stop editing" line. */
 
 
