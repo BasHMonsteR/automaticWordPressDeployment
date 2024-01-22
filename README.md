@@ -333,6 +333,47 @@ we can implement Modsecurity opensource WAF for more protection like local file 
 To prevent form **owasp top 10** list highly recommanded to use WAF :
 
         Get the official link here : https://github.com/SpiderLabs/ModSecurity
+
+build **modsecurity** and configure it to use nginx to protect from **owasp** top 10  
+
+follow this link for reference : https://www.linode.com/docs/guides/securing-nginx-with-modsecurity/
+run commands :
+        sudo apt-get install bison build-essential ca-certificates curl dh-autoreconf doxygen \
+        flex gawk git iputils-ping libcurl4-gnutls-dev libexpat1-dev libgeoip-dev liblmdb-dev \
+        libpcre3-dev libpcre++-dev libssl-dev libtool libxml2 libxml2-dev libyajl-dev locales \
+        lua5.3-dev pkg-config wget zlib1g-dev zlibc libxslt libgd-dev git
+
+        cd /opt && sudo git clone https://github.com/SpiderLabs/ModSecurity
+
+        cd ModSecurity
+
+        sudo git submodule init
+
+        sudo git submodule update
+
+        sudo ./build.sh
+
+        sudo ./configure
+
+        sudo make
+
+        sudo make install
+
+**Downloading ModSecurity-Nginx Connector**  :
+
+        cd /opt && sudo git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
+
+**Building the ModSecurity Module For Nginx**  :
+
+        nginx -v
+        nginx version: nginx/1.18.0 (Ubuntu)
+        cd /opt && sudo wget http://nginx.org/download/nginx-1.18.0.tar.gz
+        sudo tar -xvzmf nginx-1.18.0.tar.gz
+        cd nginx-1.18.0
+        
+
+        
+
 Change the default wp-admin login url to prevent attack from automated software attacks
         
 
