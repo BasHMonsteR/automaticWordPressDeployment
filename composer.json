@@ -1,6 +1,6 @@
 {
     "name": "wpe/wp-content",
-    "description": "manage dependencies with Composer and deploy to WP ",
+    "description": "manage dependencies with Composer and deploy to  WP ",
     "type": "project",
     
     "repositories": [
