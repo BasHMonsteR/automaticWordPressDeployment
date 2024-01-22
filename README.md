@@ -117,7 +117,7 @@ Configure Nginx to access the wordpress :
 
 put below code block in to config file 
     
-# Upstream to abstract backend connection(s) for php
+    # Upstream to abstract backend connection(s) for php
 
 upstream php {
  server unix:/var/run/php/php8.1-fpm.sock;
@@ -147,10 +147,10 @@ server {
 
  }
  location / {
- # This is cool because no php is touched for static content.
+    # This is cool because no php is touched for static content.
 
 
- # include the "?$args" part so non-default permalinks doesn't break when using query string
+    # include the "?$args" part so non-default permalinks doesn't break when using query string
  try_files $uri $uri/ /index.php?$args;
  }
  location ~ .php$ {
@@ -292,10 +292,10 @@ lets turn off server_token in nginx config file to turn off server info in error
 
         server_tokens off;
         proxy_hide_header X-Powered-By;
-        add_header X-Frame-Options SAMEORIGIN;          # injection attacks
+        add_header X-Frame-Options SAMEORIGIN;                             # injection attacks
         add_header Content-Security-Policy "default-src 'self';" always;   #prevent css and injection attacks
-        add_header X-Content-Type-Options "nosniff" always;  #prevent CSS
-        proxy_hide_header X-Runtime; #prevent timing bruteforce attack
+        add_header X-Content-Type-Options "nosniff" always;                #prevent CSS
+        proxy_hide_header X-Runtime;                                       #prevent timing bruteforce attack
 
 add the following line in to 
 
@@ -305,9 +305,9 @@ add below line in to server block :
 
         more_clear_headers Server;
 
-if its hosted in cloud use the cloud provider's WAF (web application firewall), and for more protection and local users use the popular WAF like modsecurity.
+if its hosted in cloud use the cloud provider's WAF (web application firewall), and for more protection and local users use the popular WAF like **modsecurity**.
 we can implement Modsecurity opensource WAF for more protection like local file inclution, remote code execution 
-To prevent form owasp top 10 list highly recommanded to use WAF :
+To prevent form **owasp top 10** list highly recommanded to use WAF :
 
         Get the official link here : https://github.com/SpiderLabs/ModSecurity
 Change the default wp-admin login url to prevent attack from automated software attacks
@@ -333,12 +333,227 @@ Change the default wp-admin login url to prevent attack from automated software 
 
         RewriteRule ^secret-folder/(.*) wp-admin/$1?%{QUERY_STRING} [L]
 
-to makeit simple wordpress plugin also available : 
+  wordpress plugin used for security : 
 
         change login url :     WPS Hide Login Plugin 
         wordpress firewall:    WordFence for WordPress
+        WP-Optimize plugin 
+        Query Monitor plugin
+        
+Modifing gzip compression values in nginx.conf files for better compression add below configs
 
 
+        gzip on;
+        gzip_disable "msie6";
+
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_buffers 16 8k;
+        gzip_http_version 1.1;
+        gzip_min_length 256;
+        gzip_types
+            application/atom+xml
+            application/geo+json
+            application/javascript
+            application/x-javascript
+            application/json
+            application/ld+json
+            application/manifest+json
+            application/rdf+xml
+            application/rss+xml
+            application/xhtml+xml
+            application/xml
+            font/eot
+            font/otf
+            font/ttf
+            image/svg+xml
+            text/css
+            text/javascript
+            text/plain
+            text/xml;
+
+save and close conf file, restart nginx to take effect using below command :
+
+        sudo systemctl restart nginx
+
+to verify new configs 
+
+    curl -H "Accept-Encoding: gzip" -I http://localhost/test.css
+
+    sample output : 
+        HTTP/1.1 200 OK
+        Server: nginx/1.18.0 (Ubuntu)
+        Date: Tue, 09 Feb 2021 19:21:54 GMT
+        Content-Type: text/css
+        Last-Modified: Tue, 09 Feb 2021 19:03:45 GMT
+        Connection: keep-alive
+        Vary: Accept-Encoding
+        ETag: W/"6022dc91-400"
+        Content-Encoding: gzip
+By modifying the number of worker connections, you can simultaneously manage the maximum number of links your server can handle
+
+        worker_connections 1024;
+
+setup Nginx FastCGI Page Cache With WordPress
+
+        sudo vim /etc/nginx/sites-available/example.com.conf
+
+At the top of the file, before the server block, add the following three directives. Some attributes can be configured to best meet the requirements of the site.
+
+The fastcgi_cache_path directive specifies the location of the cache and the cache parameters.
+
+The keys_zone attribute defines the wpcache cache and the size of the shared memory zone. 200m is enough space for over a million keys. In many cases, this can be set to a smaller size.
+
+The max_size field indicates the maximum size of the actual cache on disk. This guide sets max_size to 10g. Feel free to choose a larger or smaller amount.
+
+The inactive attribute tells NGINX when to purge data from the cache. This example uses a two-hour limit, indicated by inactive=2h. Cache contents that have not been accessed during this period are deleted.
+
+The fastcgi_cache_key directive defines the key format.
+
+fastcgi_ignore_headers disables the processing of certain response header fields that could adversely affect caching.        
 
 
+        fastcgi_cache_path /etc/nginx/cache levels=1:2 keys_zone=wpcache:200m max_size=10g inactive=2h use_temp_path=off;
+        fastcgi_cache_key "$scheme$request_method$host$request_uri";
+        fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
+
+Include exceptions for any pages that must not be cached. Some examples of pages to bypass are the WordPress administration panel, cookies, session data, queries, and POST requests. When any of the following conditions are met, the temporary variable skip_cache is set to 1. Later on, this variable is used to inform NGINX not to search the cache or cache the new contents. Add the following lines inside the server block, immediately after the line beginning with index.
+
+        set $skip_cache 0;
+
+        if ($request_method = POST) {
+            set $skip_cache 1;
+        }
+        if ($query_string != "") {
+            set $skip_cache 1;
+        }
+
+        if ($request_uri ~* "/wp-admin/|/xmlrpc.php|wp-.*.php|^/feed/*|/tag/.*/feed/*|index.php|/.*sitemap.*\.(xml|xsl)") {
+            set $skip_cache 1;
+        }
+
+        if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in") {
+            set $skip_cache 1;
+        }
+
+Add the next set of directives to the block beginning with location ~ \.php$ beneath any pre-existing instructions. This configuration includes the following directive:
+
+    The fastcgi_cache tells NGINX to enable caching. The name of the cache must match the name of the cache defined in the fastcgi_cache_path directive.
+
+    fastcgi_cache_valid defines the cache expiry time for specific HTTP status codes.
+
+    A handy NGINX attribute is the ability to deliver cached content when PHP-FPM or the database are unavailable. 
+
+    fastcgi_cache_use_stale error defines the conditions where NGINX should serve stale content. In many cases, this is preferable to returning an error page to clients.
+
+    fastcgi_cache_min_uses indicates how many times a page must be requested before it is cached. Setting this attribute to a larger value avoids caching rarely-used pages and can help manage the cache size.
+
+    fastcgi_cache_lock tells NGINX how to handle concurrent requests.
+
+    The fastcgi_cache_bypass and fastcgi_no_cache are assigned based on the value of skip_cache from the previous section. This tells NGINX not to search the cache and not to store any new content.
+
+    The add_header instruction is used to add a header field indicating whether the resource is taken from the cache or not. This field is handy for debug purposes, but is not strictly required in production code.
+
+        fastcgi_cache wpcache;
+        fastcgi_cache_valid 200 301 302 2h;
+        fastcgi_cache_use_stale error timeout updating invalid_header http_500 http_503;
+        fastcgi_cache_min_uses 1;
+        fastcgi_cache_lock on;
+        fastcgi_cache_bypass $skip_cache;
+        fastcgi_no_cache $skip_cache;
+        add_header X-FastCGI-Cache $upstream_cache_status;
+
+save and close the file
+
+        sudo nginx -t
+        sudo systemctl restart nginx        
+
+to test cache :
+
+    curl -I https://example.com/
+
+    sample output:
+
+        HTTP/1.1 200 OK
+        Date: Mon, 22 Jan 2024 06:30:39 GMT
+        Content-Type: text/html; charset=UTF-8
+        Connection: keep-alive
+        Vary: Accept-Encoding
+        Link: <https://example.com/wp-json/>; rel="https://api.w.org/"
+        X-FastCGI-Cache: **MISS**        
+
+hit the same url again with curl : 
+
+        curl -I https://example.com/
+    sample output :
+
+        HTTP/1.1 200 OK
+        Date: Mon, 22 Jan 2024 06:30:43 GMT
+        Content-Type: text/html; charset=UTF-8
+        Connection: keep-alive
+        Vary: Accept-Encoding
+        Link: <https://example.com/wp-json/>; rel="https://api.w.org/"
+        X-FastCGI-Cache: **HIT**
+
+check cache bypassing for post requests : 
+
+        curl -I https://example.com/post.php
+
+        sample output:
+        HTTP/1.1 200 OK
+        Date: Mon, 22 Jan 2024 06:39:46 GMT
+        Content-Type: text/html; charset=UTF-8
+        Connection: keep-alive
+        Vary: Accept-Encoding
+        X-FastCGI-Cache: BYPASS
+
+To support cache purging, install the following NGINX module :
+
+        sudo apt install libnginx-mod-http-cache-purge  
+
+In the search box on the upper right corner of the WordPress administration panel, type NGINX Helper and hit Enter. The Nginx Helper plugin is one of the top results on the first line of the plugins. Click the Install Now button beside it to install.          
+The Nginx Helper plugin requires some further configuration. From the side navigation panel, click the Settings label, then select Nginx Helper.
+On the Nginx Helper Settings page, select Enable Purge. After this option is enabled, the WordPress administration panel displays more options. Ensure the Caching Method is set to nginx Fastcgi cache. Select the Purging Conditions according to your preferences. In most cases, the default settings are appropriate. Select the Save All Changes button to confirm and save the selections.
+
+        On the Nginx Helper Settings page, select Enable Purge. After this option is enabled, the WordPress administration panel displays more options. Ensure the Caching Method is set to nginx Fastcgi cache. Select the Purging Conditions according to your preferences. In most cases, the default settings are appropriate. Select the Save All Changes button to confirm and save the selections.
+        Note :
+                Debug Options are available near the bottom of the configuration page to enable logging and timestamps for easier troubleshooting.
+
+Inside /etc/nginx/sites-available/example.com.conf, add the following lines to the server context. Add this block immediately after the location ~ \.php$ block.
+
+        location ~ /purge(/.*) {
+            fastcgi_cache_purge wpcache "$scheme$request_method$host$1";
+        }   
+
+validate conf file and restart nginx to load new changes : 
+
+        sudo nginx -t
+        sudo systemctl restart nginx
+
+NGINX can run multiple worker processes, each capable of processing a large number of simultaneous connections. You can control the number of worker processes and how they handle connections with the following directives:
+
+    worker_processes – The number of NGINX worker processes (the default is 1). In most cases, running one worker process per CPU core works well, and we recommend setting this directive to auto to achieve that. There are times when you may want to increase this number, such as when the worker processes have to do a lot of disk I/O.
+    worker_connections – The maximum number of connections that each worker process can handle simultaneously. The default is 512, but most systems have enough resources to support a larger number. The appropriate setting depends on the size of the server and the nature of the traffic, and can be discovered through testing.
+
+**Keepalive Connections**
+
+**Keepalive connectionscan** have a major impact on performance by reducing the CPU and network overhead needed to open and close connections. NGINX terminates all client connections and creates separate and independent connections to the upstream servers. NGINX supports keepalives for both clients and upstream servers. The following directives relate to client keepalives:
+
+**keepalive_requests** : – The number of requests a client can make over a single keepalive connection. The default is 100, but a much higher value can be especially useful for testing with a load‑generation tool, which generally sends a large number of requests from a single client.
+    keepalive_timeout – How long an idle keepalive connection remains open.
+
+The following directive relates to upstream keepalives:
+
+**keepalive** – The number of idle keepalive connections to an upstream server that remain open for each worker process. There is no default value.
+
+To enable **keepalive** connections to upstream servers you must also include the following directives in the configuration:
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";        
+
+**limit_conn and limit_conn_zone** – Limit the number of client connections NGINX accepts, for example from a single IP address. Setting them can help prevent individual clients from opening too many connections and consuming more than their share of resources.
+**limit_rate** – Limits the rate at which responses are transmitted to a client, per connection (so clients that open multiple connections can consume this amount of bandwidth for each connection). Setting a limit can prevent the system from being overloaded by certain clients, ensuring more even quality of service for all clients.
+limit_req and limit_req_zone – Limit the rate of requests being processed by NGINX, which has the same benefits as setting **limit_rate**. They can also improve security, especially for login pages, by limiting the request rate to a value reasonable for human users but too slow for programs trying to overwhelm your application with requests (such as bots in a **DDoS** attack).
+**max_conns** parameter to the server directive in an upstream configuration block – Sets the maximum number of simultaneous connections accepted by a server in an upstream group. Imposing a limit can help prevent the upstream servers from being overloaded. Setting the value to 0 (zero, the default) means there is no limit.
 
