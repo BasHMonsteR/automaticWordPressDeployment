@@ -71,7 +71,7 @@ jobs:
       - name: Check test suite files for warnings
         run: vendor/bin/phpcs tests -q --report=checkstyle | cs2pr
 
-  # Runs the JavaScript coding standards checks.
+  # Runs the JavaScript coding standards  checks.
   #
   # Performs the following steps:
   # - Checks out the repository.
