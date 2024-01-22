@@ -127,11 +127,11 @@ upstream php {
 
 server {
 
- ## Your website name goes here.
+ ##Your website name goes here.
  server_name example.com;
- ## Your only path reference.
+ ##Your only path reference.
  root /var/www/wordpress;
- ## This should be in your http block and if it is, it's not needed here.
+ ##This should be in your http block and if it is, it's not needed here.
 
 
  index index.php;
