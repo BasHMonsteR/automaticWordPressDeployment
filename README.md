@@ -204,6 +204,29 @@ generate certs with certbot :
     sudo certbot --nginx -d example.com -d www.example.com
 
 Now your wordpress website should be run on https with let's encrypt encryption.
+**Create sftpuser** in server machine to send files securily to servser :
+
+        go to ubuntu machine VPS/ local run below commands :
+        sudo useradd -s /sbin/nologin sftpuser  #create user with sftp only access
+        id sftpuser  # verify user created or not 
+        sudo vim /etc/ssh/sshd_config  # open sshd config files 
+        search for Subsystem keyword in the file 
+        after finding add below line under that Subsystem line
+
+        Match  User sftpuser
+        ForceCommand internal-sftp
+        ChrootDirectory /var/www/
+        AllowTcpForwarding no
+        X11Forwarding   no
+
+       save and close the file and restart the sshd service :
+
+         sudo systemctl restart sshd
+
+Generate id_rsa key files 
+
+           ssh-keygen -t rsa -b 4096 -C "sftpuser"
+above commad generates pub and prive key pair. store public key to machine and save private key to github secrets.      
 
 Lets create a github workflow to create automatic deployment for our wordpress site on succeful commit to out main git branch. 
 clikc on actions button on our git repo, click on  **set up a workflow yourself** button.
@@ -228,8 +251,8 @@ this deployment file i am trying to build themes by installing dependacies and b
         - name: Checkout
             uses: actions/checkout@v4.1.1
                 
-        #- name: Install Composer dependencies
-        # uses: php-actions/composer@v6
+        - name: Install Composer dependencies
+          uses: php-actions/composer@v6
 
         - name: Install Node.js LTS
             uses: actions/setup-node@v4.0.1
@@ -240,8 +263,8 @@ this deployment file i am trying to build themes by installing dependacies and b
         - name: Install Node.js dependencies
             run: yarn install
 
-        #- name: Build theme
-            #run: yarn run build
+        - name: Build theme
+            run: yarn run build
             
         - name: Upload artifact
             uses: actions/upload-artifact@v4.2.0
@@ -261,8 +284,8 @@ this deployment file i am trying to build themes by installing dependacies and b
             with:
             fetch-depth: 0
 
-        #- name: Download artifact
-        # uses: actions/download-artifact@v4
+        - name: Download artifact
+         uses: actions/download-artifact@v4
             #with:
             # name: my-theme-build
             #path: .
