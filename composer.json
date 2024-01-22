@@ -9,9 +9,7 @@
             "url": "https://wpackagist.org"
         }
     ],
-    "require": {
-        "wpackagist-plugin/wordpress-seo": "^19.10"
-    },
+  
     "extra": {
         "installer-paths": {
             "plugins/{$name}": [
