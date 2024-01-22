@@ -64,4 +64,4 @@ jobs:
             --exclude /deploy_key \
             --exclude /.git/ \
             --exclude /.github/ \
-            ./ ${{env.dest}}
+            ./wp-content ${{env.dest}}
