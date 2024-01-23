@@ -16,7 +16,8 @@
 		"dealerdirect/phpcodesniffer-composer-installer": "*",
 		"wp-coding-standards/wpcs": "*",
 		"phpcompatibility/phpcompatibility-wp": "*",
-		"phpunit/phpunit": "*"
+		"phpunit/phpunit": "*",
+		"woocommerce/woocommerce-sniffs": "*"
 	},
     "config": {
         "allow-plugins": {
