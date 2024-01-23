@@ -117,54 +117,54 @@ Configure Nginx to access the wordpress :
 
 put below code block in to config file 
     
-    # Upstream to abstract backend connection(s) for php
+            # Upstream to abstract backend connection(s) for php
 
-upstream php {
- server unix:/var/run/php/php8.1-fpm.sock;
- server 127.0.0.1:9000;
+        upstream php {
+        server unix:/var/run/php/php8.1-fpm.sock;
+        server 127.0.0.1:9000;
 
-}
+        }
 
-server {
+        server {
 
- ##Your website name goes here.
- server_name example.com;
- ##Your only path reference.
- root /var/www/wordpress;
- ##This should be in your http block and if it is, it's not needed here.
-
-
- index index.php;
- location = /favicon.ico {
- log_not_found off;
- access_log off;
-
- }
- location = /robots.txt {
- allow all;
- log_not_found off;
- access_log off;
-
- }
- location / {
-    # This is cool because no php is touched for static content.
+        ##Your website name goes here.
+        server_name example.com;
+        ##Your only path reference.
+        root /var/www/wordpress;
+        ##This should be in your http block and if it is, it's not needed here.
 
 
-    # include the "?$args" part so non-default permalinks doesn't break when using query string
- try_files $uri $uri/ /index.php?$args;
- }
- location ~ .php$ {
- #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
- include fastcgi_params;
- fastcgi_intercept_errors on;
- fastcgi_pass php;
- #The following parameter can be also included in fastcgi_params file
- fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
- }
- location ~* .(js|css|png|jpg|jpeg|gif|ico)$ {
- expires max;
- log_not_found off;
- }
+        index index.php;
+        location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+
+        }
+        location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+
+        }
+        location / {
+            # This is cool because no php is touched for static content.
+
+
+            # include the "?$args" part so non-default permalinks doesn't break when using query string
+        try_files $uri $uri/ /index.php?$args;
+        }
+        location ~ .php$ {
+        #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+        include fastcgi_params;
+        fastcgi_intercept_errors on;
+        fastcgi_pass php;
+        #The following parameter can be also included in fastcgi_params file
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+        location ~* .(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+        }
          
    **save and exit the file**
    
@@ -235,7 +235,7 @@ create a deployment.yaml file
 this deployment file i am trying to build themes by installing dependacies and building then after that i am syncing the directory with rsync utility to sych with my wordpress site location files and send securly.
 
 
-        name: build-deploy
+    name: build-deploy
     on:
     push:
         branches:
@@ -305,6 +305,43 @@ this deployment file i am trying to build themes by installing dependacies and b
 
 On succesful commit to main branch deploment will happen to server, dont forget to creat github secret variable with scp user name and id_rsa kay and host name. Becareful with location as rsync mirrors the dest and src so it might delete files.
 
+Now, integrate automatic code standards testing to php files with php **code sniffer** : 
+clikc on actions button on our git repo, click on  **set up a workflow yourself** button.
+create a phpcs.yaml file
+
+                name: "PHP code test "
+
+                on:
+                pull_request:
+                    paths:
+                    - "**.php"
+                    - "phpcs.xml"
+                    - ".github/workflows/phpcs.yml"
+
+                jobs:
+                phpcs:
+                    runs-on: ubuntu-latest
+                    steps:
+                    - uses: actions/checkout@v2
+                        with:
+                        fetch-depth: 0 # important!
+
+                    # we may use whatever way to install phpcs, just specify the path on the next step
+                    # however, curl seems to be the fastest
+                    - name: Install PHP_CodeSniffer
+                        run: |
+                        curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+                        php phpcs.phar --version
+
+                    - uses: thenabeel/action-phpcs@v8
+                        with:
+                        files: "**.php" # you may customize glob as needed
+                        phpcs_path: php phpcs.phar
+                        standard: phpcs.xml
+
+
+save and commit chages.
+
 LEMP (Linux, Nginx, MySQL, PHP) stack deployment completed with default and basic configurations.
 Lets make optimize nginx performance :
 
@@ -370,11 +407,125 @@ run commands :
         cd /opt && sudo wget http://nginx.org/download/nginx-1.18.0.tar.gz
         sudo tar -xvzmf nginx-1.18.0.tar.gz
         cd nginx-1.18.0
-        
+        nginx -V
+        sample output :
 
-        
+            nginx version: nginx/1.18.0 (Ubuntu)
+            built with OpenSSL 3.0.2 15 Mar 2022
+            TLS SNI support enabled
+            configure arguments: --with-cc-opt='-g -O2 -ffile-prefix-map=/build/nginx-zctdR4/nginx-1.18.0=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2' --with-ld-opt='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -fPIC' --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --lock-path=/var/lock/nginx.lock --pid-path=/run/nginx.pid --modules-path=/usr/lib/nginx/modules --http-client-body-temp-path=/var/lib/nginx/body --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-proxy-temp-path=/var/lib/nginx/proxy --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --with-compat --with-debug --with-pcre-jit --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_auth_request_module --with-http_v2_module --with-http_dav_module --with-http_slice_module --with-threads --add-dynamic-module=/build/nginx-zctdR4/nginx-1.18.0/debian/modules/http-geoip2 --with-http_addition_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_sub_module
 
-Change the default wp-admin login url to prevent attack from automated software attacks
+            To compile the Modsecurity module, copy all of the arguments following configure arguments: from your output of the above command and paste them in place of <Configure Arguments> in the following command:
+
+            sudo ./configure --add-dynamic-module=../ModSecurity-nginx <Configure Arguments>
+
+            sudo make modules
+            sudo mkdir /etc/nginx/modules
+            sudo cp objs/ngx_http_modsecurity_module.so /etc/nginx/modules
+
+**load_module** /etc/nginx/modules/ngx_http_modsecurity_module.so;
+
+            load_module /etc/nginx/modules/ngx_http_modsecurity_module.so;
+
+            Here is an example portion of an Nginx configuration file that includes the above line:
+
+            user www-data;
+            worker_processes auto;
+            pid /run/nginx.pid;
+            include /etc/nginx/modules-enabled/*.conf;
+            load_module /etc/nginx/modules/ngx_http_modsecurity_module.so;
+
+To set up the **OWASP-CRS**, follow the procedures outlined below.
+
+First, delete the current rule set that comes prepackaged with ModSecurity by running the following command:
+
+                sudo rm -rf /usr/share/modsecurity-crs
+
+Clone the OWASP-CRS GitHub repository into the /usr/share/modsecurity-crs directory:
+
+                sudo git clone https://github.com/coreruleset/coreruleset /usr/local/modsecurity-crs
+
+Rename the crs-setup.conf.example to crs-setup.conf:
+
+                sudo mv /usr/local/modsecurity-crs/crs-setup.conf.example /usr/local/modsecurity-crs/crs-setup.conf
+
+Rename the default request exclusion rule file:
+
+                sudo mv /usr/local/modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example /usr/local/modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+
+You should now have the OWASP-CRS set up and ready to be used in your Nginx configuration.
+        
+**Configuring Modsecurity**     
+ModSecurity is a firewall and therefore requires rules to function. This section shows you how to implement the OWASP Core Rule Set. First, you must prepare the ModSecurity configuration file.
+
+Start by creating a ModSecurity directory in the /etc/nginx/ directory:
+
+        sudo mkdir -p /etc/nginx/modsec
+
+Copy over the unicode mapping file and the ModSecurity configuration file from your cloned ModSecurity GitHub repository:
+
+        sudo cp /opt/ModSecurity/unicode.mapping /etc/nginx/modsec
+        sudo cp /opt/ModSecurity/modsecurity.conf-recommended /etc/nginx/modsec/modsecurity.conf
+
+Remove the .recommended extension from the ModSecurity configuration filename with the following command:
+
+     sudo cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+With a text editor such as vim, open /etc/modsecurity/modsecurity.conf and change the value for SecRuleEngine to On:
+
+File: /etc/modsecurity/modsecurity.conf
+
+            # -- Rule engine initialization ----------------------------------------------
+
+            # Enable ModSecurity, attaching it to every transaction. Use detection
+            # only to start with, because that minimises the chances of post-installation
+            # disruption.
+            #
+            SecRuleEngine On
+            ...
+
+Create a new configuration file called main.conf under the /etc/nginx/modsec directory:
+
+            sudo touch /etc/nginx/modsec/main.conf
+
+Open /etc/nginx/modsec/main.conf with a text editor such as vim and specify the rules and the Modsecurity configuration file for Nginx by inserting following lines:
+
+            File: /etc/modsecurity/modsecurity.conf
+
+            Include /etc/nginx/modsec/modsecurity.conf
+            Include /usr/local/modsecurity-crs/crs-setup.conf
+            Include /usr/local/modsecurity-crs/rules/*.conf
+
+**Configuring Nginx**      
+
+            Open the /etc/nginx/sites-available/default with a text editor such as vim and insert the following lines in your server block:
+
+                modsecurity on;
+                modsecurity_rules_file /etc/nginx/modsec/main.conf;
+
+Restart the nginx service to apply the configuration:
+
+             sudo systemctl restart nginx
+
+**Testing ModSecurity**       
+
+Test ModSecurity by performing a simple local file inclusion attack by running the following command:
+
+            curl http://<SERVER-IP/DOMAIN>/index.html?exec=/bin/bash
+
+If ModSecurity has been configured correctly and is actively blocking attacks, the following error is returned:
+
+                <html>
+                <head><title>403 Forbidden</title></head>
+                <body bgcolor="white">
+                <center><h1>403 Forbidden</h1></center>
+                <hr><center>nginx/1.14.0 (Ubuntu)</center>
+                </body>
+                </html>
+
+
+
+#Change the default wp-admin login url to prevent attack from automated software attacks :
         
 
         Add constant to wp-config.php :
