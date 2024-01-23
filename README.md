@@ -14,7 +14,31 @@ Server Provisioning:
     Generate and configure SSH key pairs for secure remote access...
     you can continue below with your local machine/server. 
 
-Nginx, MySQL/MariaDB, and PHP Setup:
+
+**Local -->** :
+create a local directory for wordpress changes in our local system : 
+
+        mkdir wordpress
+
+open gitbash here if your OS is windows / open terminal here if your OS is Linux :
+
+        git init  # to initilize directory 
+
+it creates .git directory with all required configurations.
+        add your email and user it to conf file inside .git directory.
+        now add all your wordpress related files which you want to send to remore server in this directory and everytime do the changes in this directory or add changes in this directory.
+        everytime you add a new change commit to git to perform deployment to remote server :
+        create a new branch :
+
+        git branch new-branch
+        git checkout new-branch
+        git add modified files (git add .# to add all modifies files) 
+        git commit ( add commit message)
+        git push
+
+**VPS and locally -->** :
+
+Nginx, MySQL/MariaDB, and PHP Setup on **VPS and locally**:
  
 Brefore going to setup update the system:
 
@@ -204,10 +228,13 @@ generate certs with certbot :
     sudo certbot --nginx -d example.com -d www.example.com
 
 Now your wordpress website should be run on https with let's encrypt encryption.
+
+**VPS -->** :
 **Create sftpuser** in server machine to send files securily to servser :
 
-        go to ubuntu machine VPS/ local run below commands :
-        sudo useradd -s /sbin/nologin sftpuser  #create user with sftp only access
+go to ubuntu machine **VPS** run below commands :
+
+        sudo useradd -aG sftpuser  #create user with sftp only access
         id sftpuser  # verify user created or not 
         sudo vim /etc/ssh/sshd_config  # open sshd config files 
         search for Subsystem keyword in the file 
@@ -228,7 +255,8 @@ Generate id_rsa key files
            ssh-keygen -t rsa -b 4096 -C "sftpuser"
 above commad generates pub and prive key pair. store public key to machine and save private key to github secrets.      
 
-Lets create a github workflow to create automatic deployment for our wordpress site on succeful commit to out main git branch. 
+**Github -->** :
+Lets create a **github workflow** to create automatic deployment for our wordpress site on succeful commit to out main git branch. 
 clikc on actions button on our git repo, click on  **set up a workflow yourself** button.
 create a deployment.yaml file
 
@@ -341,6 +369,8 @@ create a phpcs.yaml file
 
 
 save and commit chages.
+
+**VPS -->** : 
 
 LEMP (Linux, Nginx, MySQL, PHP) stack deployment completed with default and basic configurations.
 Lets make optimize nginx performance :
@@ -772,3 +802,8 @@ To enable **keepalive** connections to upstream servers you must also include th
 limit_req and limit_req_zone – Limit the rate of requests being processed by NGINX, which has the same benefits as setting **limit_rate**. They can also improve security, especially for login pages, by limiting the request rate to a value reasonable for human users but too slow for programs trying to overwhelm your application with requests (such as bots in a **DDoS** attack).
 **max_conns** parameter to the server directive in an upstream configuration block – Sets the maximum number of simultaneous connections accepted by a server in an upstream group. Imposing a limit can help prevent the upstream servers from being overloaded. Setting the value to 0 (zero, the default) means there is no limit.
 
+**Local -->** : 
+
+Add all created/modified changes into git repo to deploy to remote servers from local git directory. 
+All wordpress files themes plugins etc can commit to git deploy to remote server.
+every commit changes to wordpress site deploys automatically with github actions.
