@@ -18,6 +18,11 @@
 		"phpcompatibility/phpcompatibility-wp": "*",
 		"phpunit/phpunit": "*"
 	},
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
 	"autoload-dev": {
 		"files": [
 			"tests/phpunit/includes/phpunit7/MockObject/Builder/NamespaceMatch.php",
