@@ -11,3 +11,4 @@ package-lock.json
 composer.json
 composer.lock
 nginx.conf
+nginx_sites-available.conf
